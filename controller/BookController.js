@@ -12,7 +12,7 @@ const allBooks = (req,res) => {
 
     let offset = limit * (currentPage-1);
 
-    let sql = "SELECT * FROM books";
+    let sql = "SELECT *, (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes FROM books";
     let values = [];
     // 2개가 걸리는 것이 제일 위로 
     if(category_id&&news) {
@@ -44,11 +44,19 @@ const allBooks = (req,res) => {
 };
 
 const bookDetail = (req,res) => {
-    let {id} = req.params;
+    let {user_id} = req.body;
+    let book_id = req.params.id;
 
     // SELECT * FROM books LEFT JOIN category ON books.category_id = category.id WHERE books.id=1;
-    let sql = `SELECT * FROM books LEFT JOIN category ON books.category_id = category.id WHERE books.id=?`;
-    conn.query(sql, id,
+    let sql = `SELECT *,
+                    (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes,
+                    (SELECT EXISTS (SELECT * FROM likes WHERE user_id=? AND liked_book_id=?)) AS liked
+                FROM books 
+                LEFT JOIN category
+                ON books.category_id = category.category_id
+                WHERE books.id=?`;
+    let values = [user_id, book_id, book_id]
+    conn.query(sql, values,
         (err, results) => {
         if(err) {
             console.log(err);

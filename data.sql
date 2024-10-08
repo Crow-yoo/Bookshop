@@ -36,3 +36,49 @@ JOIN category ON books.category_id = category.id;
 
  id가 1인 친구 조회하기
 SELECT * FROM books LEFT JOIN category ON books.category_id = category.id WHERE books.id=1;
+
+INSERT INTO likes (user_id, liked_book_id) VALUES (1, 1);
+INSERT INTO likes (user_id, liked_book_id) VALUES (1, 2);
+INSERT INTO likes (user_id, liked_book_id) VALUES (1, 3);
+INSERT INTO likes (user_id, liked_book_id) VALUES (3, 1);
+INSERT INTO likes (user_id, liked_book_id) VALUES (4, 4);
+INSERT INTO likes (user_id, liked_book_id) VALUES (2, 1);
+INSERT INTO likes (user_id, liked_book_id) VALUES (2, 2);
+INSERT INTO likes (user_id, liked_book_id) VALUES (2, 3);
+INSERT INTO likes (user_id, liked_book_id) VALUES (2, 5);
+
+#테이블의 조건을 만족하는 행 개수 
+SELECT count(*) FROM likes WHERE liked_book_id=1;
+
+
+DELETE FROM likes WHERE user_id = 1 AND liked_book_id = 3;
+
+// 해당 책마다의 좋아요 갯수 books 테이블에 추가
+SELECT *,
+	(SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes
+    FROM books;
+
+
+SELECT EXISTS (SELECT * FROM likes WHERE user_id=1 AND liked_book_id=1)
+// 개별도서에 사용자가 좋아요 했는지 여부
+SELECT *,
+ (SELECT EXISTS (SELECT * FROM likes WHERE user_id=1 AND liked_book_id=1)) AS liked
+FROM books WHERE books.id=1;
+
+// 개별도서에 몇명의 사용자가 
+SELECT *,
+ (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes,
+ (SELECT EXISTS (SELECT * FROM likes WHERE user_id=1 AND liked_book_id=1)) AS liked
+FROM books WHERE books.id=1;
+
+SELECT * FROM books LEFT JOIN category ON books.category_id = category.id WHERE books.id=?
+
+SELECT *,
+ (SELECT count(*) FROM likes WHERE liked_book_id=books.id) AS likes,
+ (SELECT EXISTS (SELECT * FROM likes WHERE user_id=1 AND liked_book_id=1)) AS liked
+FROM books 
+LEFT JOIN category
+ON books.category_id = category.id
+WHERE books.id=1;
+
+
